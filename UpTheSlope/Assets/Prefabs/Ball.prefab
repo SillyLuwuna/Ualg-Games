@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 2241955253480051564}
   - component: {fileID: 334168290414745666}
   - component: {fileID: 2747509845880937007}
-  - component: {fileID: 7002891317050591075}
   - component: {fileID: 3008002139588016467}
   - component: {fileID: -5707447244875276581}
+  - component: {fileID: -5080664551461989617}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -143,19 +143,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &7002891317050591075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2162422300610246872}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b3a2d24ce24a45b6a762c44ddec5f9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BallDespawner
-  despawnTimer: 60
 --- !u!114 &3008002139588016467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,3 +252,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-5080664551461989617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2162422300610246872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21772ef0d37a05868df7dec5bd40aa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectDespawner
