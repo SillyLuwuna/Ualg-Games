@@ -2,5 +2,6 @@ using UnityEngine;
 
 public interface IDriver
 {
-	Vector3 move(float maxSpeed);
+	float accelerate(float maxSpeed);
+	float turn(float maxSpeed);
 }

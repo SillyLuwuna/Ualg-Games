@@ -1,12 +1,22 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Human : Driver
 {
-	public override Vector3 move(float maxSpeed)
-	{
-		float dx = Input.GetAxis("Horizontal");
-		float dy = Input.GetAxis("Vertical");
+	private Vector2 _dir = Vector2.zero;
 
-		return new Vector3(dx, 0, dy) * maxSpeed;
+	public override float accelerate(float maxSpeed)
+	{
+		return _dir.y * maxSpeed;
+	}
+
+	public override float turn(float maxSpeed)
+	{
+		return _dir.x * maxSpeed;
+	}
+
+	void OnMove(InputValue value)
+	{
+		_dir = value.Get<Vector2>();
 	}
 }
