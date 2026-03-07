@@ -38,7 +38,6 @@ public class MoveCar : MonoBehaviour
 
 		Vector3 translation = transform.forward * accel;
 		transform.position += translation;
-		// transform.Translate(translation);
 	}
 
 	private void UpdateFuel(Vector3 currPos, Vector3 updatedPos)
