@@ -192,6 +192,7 @@ GameObject:
   - component: {fileID: 1337414393617551097}
   - component: {fileID: 1825686575999962976}
   - component: {fileID: 2371522023035245041}
+  - component: {fileID: -1526253621202031408}
   m_Layer: 0
   m_Name: car_bus
   m_TagString: Untagged
@@ -311,7 +312,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveCar
   maxSpeed: 3
-  turnSpeed: 0
+  turnSpeed: 50
   fuel: 10000
   driver: {fileID: 1337414393617551097}
 --- !u!114 &1337414393617551097
@@ -326,6 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8851db903346d4175a8ec0055c7fd418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AI
+  DistanceForActivation: 10
 --- !u!54 &1825686575999962976
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -365,6 +367,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d21772ef0d37a05868df7dec5bd40aa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectDespawner
+  yTrigger: -100
+--- !u!114 &-1526253621202031408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4445957783772175549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a7b8cb598fa999989bb170ee1091eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectTrackerSensor
+  TrackingFrequency: 0.1
 --- !u!1 &5014083937809482486
 GameObject:
   m_ObjectHideFlags: 0

@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &11803783 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1661385053232453744, guid: 7fe6f266e938f0790ae2d420aafb52e9, type: 3}
+  m_PrefabInstance: {fileID: 2005026703}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &20525927
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,6 +364,7 @@ GameObject:
   - component: {fileID: 65696038}
   - component: {fileID: 65696040}
   - component: {fileID: 65696041}
+  - component: {fileID: 65696042}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -444,6 +450,19 @@ MonoBehaviour:
   - {fileID: 2188195658547500389, guid: a39c01e8c299c71088fac87788151750, type: 3}
   spawnPosition: {x: 0.5, y: 3.5, z: -92}
   spawnRotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &65696042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65696037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1fe74f866ec8d12ebb09befabd26354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameReferencesInitializer
+  player: {fileID: 11803783}
 --- !u!1 &158867058
 GameObject:
   m_ObjectHideFlags: 0
@@ -3572,7 +3591,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1969652048207978757, guid: 7fe6f266e938f0790ae2d420aafb52e9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.27
+      value: 3.52
       objectReference: {fileID: 0}
     - target: {fileID: 1969652048207978757, guid: 7fe6f266e938f0790ae2d420aafb52e9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3606,10 +3625,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4188218926203552173, guid: 7fe6f266e938f0790ae2d420aafb52e9, type: 3}
-      propertyPath: hitsText
-      value: 
-      objectReference: {fileID: 1797706020}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -79,7 +79,6 @@ GameObject:
   - component: {fileID: 4188218926203552173}
   - component: {fileID: 6681166826340421900}
   - component: {fileID: 5704831675287171407}
-  - component: {fileID: 8857207051855056322}
   - component: {fileID: 6959955039881017315}
   - component: {fileID: 4160504001740366151}
   m_Layer: 0
@@ -230,8 +229,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f9eb7687be70d7c4bbaaf6675bc0690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitCounter
-  hitsText: {fileID: 0}
-  hitsBaseText: 'hits: '
 --- !u!114 &6681166826340421900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,18 +257,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30fc2684d56046874aab952d933c32f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Human
---- !u!114 &8857207051855056322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1661385053232453744}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8851db903346d4175a8ec0055c7fd418, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AI
 --- !u!114 &6959955039881017315
 MonoBehaviour:
   m_ObjectHideFlags: 0

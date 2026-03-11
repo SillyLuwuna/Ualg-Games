@@ -53,12 +53,15 @@
     <Compile Include="Assets/Scripts/PlayerController.cs" />
     <Compile Include="Assets/Scripts/IDriver.cs" />
     <Compile Include="Assets/Scripts/MoveCar.cs" />
+    <Compile Include="Assets/Scripts/GameReferences.cs" />
     <Compile Include="Assets/Scripts/Human.cs" />
     <Compile Include="Assets/Scripts/AI.cs" />
     <Compile Include="Assets/TutorialInfo/Scripts/Readme.cs" />
     <Compile Include="Assets/Scripts/BallSpawner.cs" />
     <Compile Include="Assets/Scripts/CarSpawner.cs" />
+    <Compile Include="Assets/Scripts/ObjectTrackingSensor.cs" />
     <Compile Include="Assets/Scripts/ObjectDespawner.cs" />
+    <Compile Include="Assets/Scripts/GameReferencesInitializer.cs" />
     <Compile Include="Assets/Scripts/ChangeCamera.cs" />
     <Compile Include="Assets/Scripts/Driver.cs" />
   </ItemGroup>
