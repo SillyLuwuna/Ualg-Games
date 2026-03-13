@@ -19,7 +19,7 @@
             {
                 "type": "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
                 "key": "buildOutputDirList",
-                "value": "{\"m_Value\":\"/home/luna/Documents/uni_code/jc/UpTheSlope/TestBuild;/home/luna/Documents/uni_code/jc/UpTheSlope/WebGL Builds/UpTheSlope;;;;;;;;\"}"
+                "value": "{\"m_Value\":\"/home/luna/Documents/uni_code/jc/UpTheSlope/BuildWebGL;/home/luna/Documents/uni_code/jc/UpTheSlope/Build;/home/luna/Documents/uni_code/jc/UpTheSlope/TestBuild;/home/luna/Documents/uni_code/jc/UpTheSlope/WebGL Builds/UpTheSlope;;;;;;\"}"
             }
         ]
     }
