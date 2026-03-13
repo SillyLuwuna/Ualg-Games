@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="Assets/Scripts/HitCounter.cs" />
     <Compile Include="Assets/Scripts/BallSoundPlayer.cs" />
-    <Compile Include="Assets/Scripts/PlayerController.cs" />
     <Compile Include="Assets/Scripts/IDriver.cs" />
     <Compile Include="Assets/Scripts/MoveCar.cs" />
     <Compile Include="Assets/Scripts/GameReferences.cs" />
