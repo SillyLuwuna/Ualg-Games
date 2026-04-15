@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "m5SFMsiU+bs=",
+  "success": true,
+  "projectFilePath": "/home/luna/Documents/uni_code/jc/mancuna_ai/Mancuna/Mancuna.csproj",
+  "expectedPackageFiles": [
+    "/home/luna/.nuget/packages/microsoft.aspnetcore.app.ref/10.0.4/microsoft.aspnetcore.app.ref.10.0.4.nupkg.sha512"
+  ],
+  "logs": []
+}
