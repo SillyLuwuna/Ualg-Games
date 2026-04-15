@@ -9,11 +9,16 @@ public class PlayerMancuna : Player
 {
     private Dictionary<IBoard, Outcome> _cacheMax;
     private Dictionary<IBoard, Outcome> _cacheMin;
+	private Dictionary<IBoard, ulong> _boardFrequency;
+	private ulong _maxDepth;
 
 	public PlayerMancuna(string name, int pos) : base(name, pos)
 	{
 		_cacheMax = new Dictionary<IBoard, Outcome>();
 		_cacheMin = new Dictionary<IBoard, Outcome>();
+		_boardFrequency = new Dictionary<IBoard, ulong>();
+		// _maxDepth = 11;
+		_maxDepth = ulong.MaxValue;
 	}
 
 	private enum Outcome
@@ -30,8 +35,7 @@ public class PlayerMancuna : Player
 		Thread.Sleep(1000);
 		_cacheMax.Clear();
 		_cacheMin.Clear();
-		// ulong maxDepth = 11;
-		ulong maxDepth = 10000;
+		_boardFrequency.Clear();
 
 		int forcedPlay = board.forcedPlay();
 		if (forcedPlay != -1)
@@ -39,7 +43,7 @@ public class PlayerMancuna : Player
 			List<IBoard> children9;
 			List<int> play9;
 			(children9, play9) = board.children();
-			Outcome outcome9 = GetOutcome(children9[0], maxDepth);
+			Outcome outcome9 = GetOutcome(children9[0]);
 			Console.WriteLine("Option: " + outcome9.ToString());
 			Console.WriteLine();
 			return forcedPlay;
@@ -51,7 +55,7 @@ public class PlayerMancuna : Player
 		List<int> play;
 		(children, play) = board.children();
 
-		Outcome outcome0 = GetOutcome(children[0], maxDepth);
+		Outcome outcome0 = GetOutcome(children[0]);
 		if (outcome0 == Outcome.Win)
 		{
 			// Thread.Sleep(1000);
@@ -59,7 +63,7 @@ public class PlayerMancuna : Player
 		}
 		if (outcome0 == Outcome.Win) return play[0];
 
-		Outcome outcome1 = GetOutcome(children[1], maxDepth);
+		Outcome outcome1 = GetOutcome(children[1]);
 		if (outcome1 == Outcome.Win)
 		{
 			// Thread.Sleep(1000);
@@ -80,17 +84,27 @@ public class PlayerMancuna : Player
 		return play[0];
 	}
 
-	private Outcome GetOutcome(IBoard board, ulong maxDepth)
+	private Outcome GetOutcome(IBoard board)
 	{
-		return GetOutcome(board, 0, true, maxDepth);
+		return GetOutcome(board, 0, true);
 	}
 
-	private Outcome GetOutcome(IBoard board, ulong depth, bool isMin, ulong maxDepth)
+	private Outcome GetOutcome(IBoard board, ulong depth, bool isMin)
 	{
-		if (depth >= maxDepth) return Outcome.Unknown;
+		if (depth >= _maxDepth) return Outcome.Unknown;
 		// Console.WriteLine("---");
 		// Console.WriteLine(board);
 		// Console.WriteLine("---");
+
+		if (!_boardFrequency.ContainsKey(board))
+		{
+			_boardFrequency[board] = 0;
+		}
+		_boardFrequency[board]++;
+		if (_boardFrequency[board] >= 3)
+		{
+			return Outcome.Tie;
+		}
 
 		Outcome cacheResult = LoadFromCache(board, isMin);
 		if (cacheResult != Outcome.Invalid) return cacheResult;
@@ -104,7 +118,7 @@ public class PlayerMancuna : Player
 		List<int> play;
 		(children, play) = board.children();
 
-		Outcome outcome0 = GetOutcome(children[0], depth + 1, !isMin, maxDepth);
+		Outcome outcome0 = GetOutcome(children[0], depth + 1, !isMin);
 		SaveToCache(children[0], outcome0, !isMin);
 
 		if (outcome0 == Outcome.Win && !isMin) return Outcome.Win;
@@ -113,7 +127,7 @@ public class PlayerMancuna : Player
 		Outcome outcome1 = Outcome.Invalid;
 		if (children.Count > 1)
 		{
-			outcome1 = GetOutcome(children[1], depth + 1, !isMin, maxDepth);
+			outcome1 = GetOutcome(children[1], depth + 1, !isMin);
 			SaveToCache(children[1], outcome1, !isMin);
 		}
 		if (outcome1 == Outcome.Win && !isMin) return Outcome.Win;
@@ -127,11 +141,6 @@ public class PlayerMancuna : Player
 
 	private void SaveToCache(IBoard board, Outcome outcome, bool isMin)
 	{
-		// if (outcome == Outcome.Unknown)
-		// {
-		// 	return;
-		// }
-
 		if (isMin && !_cacheMin.ContainsKey(board))
 		{
 			_cacheMin.Add(board, outcome);
