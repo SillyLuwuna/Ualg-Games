@@ -29,7 +29,7 @@ public class MancunaMatch
     static IPlayer mp = new PlayerMancuna("MancunaPlayer0", 0);
 
     static int matches = 10000;
-    static bool verbose = true;
+    static bool verbose = false;
 
     public static void Main(string[] args)
     {
