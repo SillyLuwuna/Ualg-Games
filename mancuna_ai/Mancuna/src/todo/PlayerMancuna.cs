@@ -7,19 +7,22 @@
 
 public class PlayerMancuna : Player
 {
-    private Dictionary<IBoard, Outcome> _cache;
-	private Dictionary<IBoard, ulong> _boardFrequency;
+    // private Dictionary<IBoard, double> _cache;
+    // private Dictionary<IBoard, double> _cacheTied;
+	private List<Dictionary<IBoard, double>> _cache;
+	private Dictionary<IBoard, int> _boardFrequency;
 	private ulong _maxDepth;
-	private int _otherPlayer;
-	private bool _firstPlay;
+	private int _firstBoardHash;
+	private int _count;
 
 	public PlayerMancuna(string name, int pos) : base(name, pos)
 	{
-		_cache = new Dictionary<IBoard, Outcome>();
-		_boardFrequency = new Dictionary<IBoard, ulong>();
-		_maxDepth = ulong.MaxValue;
-		_otherPlayer = GetOtherPlayer(_position);
-		_firstPlay = true;
+		// _cache = new Dictionary<IBoard, double>();
+		_cache = new List<Dictionary<IBoard, double>>();
+		_boardFrequency = new Dictionary<IBoard, int>();
+		// _maxDepth = ulong.MaxValue;
+		_maxDepth = 3;
+		_firstBoardHash = -1;
 	}
 
 	private enum Outcome
@@ -33,105 +36,147 @@ public class PlayerMancuna : Player
 
 	public override int play(IBoard board)
 	{ 
-		_otherPlayer = GetOtherPlayer(_position);
+		if (HasReset(board))
+		{
+			_count++;
+			Console.WriteLine(_count);
+			_boardFrequency.Clear();
+		}
+		// Thread.Sleep(1000);
+		IncreaseFrequency(board);
 
 		int forcedPlay = board.forcedPlay();
 		if (forcedPlay != -1)
 		{
-			List<IBoard> children9;
-			List<int> play9;
-			(children9, play9) = board.children();
-			Outcome outcome9 = GetOutcome(children9[0], 0, true);
+			List<IBoard> fchildren;
+			(fchildren, _) = board.children();
+			IncreaseFrequency(fchildren[0]);
 			return forcedPlay;
 		}
 
 		List<IBoard> children;
 		List<int> play;
 		(children, play) = board.children();
+		double score0 = MinMax(children[0], 0, true);
+		double score1 = MinMax(children[1], 0, true);
+		// Console.WriteLine("Option 0: " + score0);
+		// Console.WriteLine("Option 1: " + score1);
+		// Console.WriteLine();
 
-		Outcome outcome0 = GetOutcome(children[0], 0, true);
-		if (outcome0 == Outcome.Win) return play[0];
-
-		Outcome outcome1 = GetOutcome(children[1], 0, true);
-		if (outcome1 == Outcome.Win) return play[1];
-
-		_firstPlay = false;
-
-		if (outcome0 == Outcome.Tie) return play[0];
-		if (outcome1 == Outcome.Tie) return play[1];
-
-		if (outcome0 == Outcome.Unknown) return play[0];
-		if (outcome1 == Outcome.Unknown) return play[1];
-
-		return play[0];
+		if (score0 > score1)
+		{
+			IncreaseFrequency(children[0]);
+			return play[0];
+		}
+		IncreaseFrequency(children[1]);
+		return play[1];
 	}
 
-	private Outcome GetOutcome(IBoard board, ulong depth, bool isMin)
+	private double MinMax(IBoard board, ulong depth, bool isMin)
 	{
-		if (depth >= _maxDepth) return Outcome.Unknown;
-
-		Outcome cacheResult = LoadFromCache(board, isMin);
-		if (cacheResult != Outcome.Invalid) return cacheResult;
-
-		if (_firstPlay) UpdateFrequency(board);
-		if (IsTied(board)) return Outcome.Tie;
-
-		Outcome boardOutcome = GetBoardOutcome(board, _position);
-		if (boardOutcome != Outcome.Unknown) return boardOutcome;
+		if (depth >= _maxDepth) return GetBoardScore(board);
+		IncreaseFrequency(board);
+		// if (CacheContains(board))
+		// {
+		// 	double cached = LoadFromCache(board);
+		// 	if (IsTied(board) || GameEnded(board))
+		// 	{
+		// 		if (cached != GetBoardScore(board))
+		// 		{
+		// 			Console.WriteLine("Inaccuracy!");
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		List<IBoard> ch;
+		// 		(ch, _) = board.children();
+		// 		if (ch.Count > 1)
+		// 		{
+		// 			IncreaseFrequency(ch[0]);
+		// 			double sc0 = LoadFromCache(ch[0]);
+		// 			DecreaseFrequency(ch[0]);
+		// 			IncreaseFrequency(ch[1]);
+		// 			double sc1 = LoadFromCache(ch[1]);
+		// 			DecreaseFrequency(ch[1]);
+		//
+		// 			if (isMin && (double.Min(sc0, sc1) != cached))
+		// 			{
+		// 				Console.WriteLine(board);
+		// 				Console.WriteLine("Inaccuracy!");
+		// 			}
+		// 			else if (!isMin && (double.Max(sc0, sc1) != cached))
+		// 			{
+		// 				Console.WriteLine(board);
+		// 				Console.WriteLine("Inaccuracy!");
+		// 			}
+		// 		}
+		// 	}
+		// 	DecreaseFrequency(board);
+		// 	return cached;
+		// }
+		if (IsTied(board) || GameEnded(board))
+		{
+			double currScore = GetBoardScore(board);
+			// SaveToCache(board, currScore);
+			DecreaseFrequency(board);
+			return currScore;
+		}
 
 		List<IBoard> children;
 		(children, _) = board.children();
 
-		Outcome outcome0 = GetOutcome(children[0], depth + 1, !isMin);
-		SaveToCache(children[0], outcome0, !isMin);
-
-		if (outcome0 == Outcome.Win && !isMin) return Outcome.Win;
-		if (outcome0 == Outcome.Lose && isMin) return Outcome.Lose;
-
-		Outcome outcome1 = Outcome.Invalid;
-		if (children.Count > 1)
+		double score0 = MinMax(children[0], depth + 1, !isMin);
+		if (children.Count <= 1)
 		{
-			outcome1 = GetOutcome(children[1], depth + 1, !isMin);
-			SaveToCache(children[1], outcome1, !isMin);
+			// SaveToCache(board, score0);
+			DecreaseFrequency(board);
+			return score0;
 		}
-		if (outcome1 == Outcome.Win && !isMin) return Outcome.Win;
-		if (outcome1 == Outcome.Lose && isMin) return Outcome.Lose;
+		double score1 = MinMax(children[1], depth + 1, !isMin);
 
-		if (outcome0 == Outcome.Tie || outcome1 == Outcome.Tie) return Outcome.Tie;
-		if (outcome0 == Outcome.Unknown || outcome1 == Outcome.Unknown) return Outcome.Unknown;
-
-		return isMin ? Outcome.Win : Outcome.Lose;
+		double score = isMin ? double.Min(score0, score1) : double.Max(score0, score1);
+		// SaveToCache(board, score);
+		DecreaseFrequency(board);
+		return score;
 	}
 
-	private void SaveToCache(IBoard board, Outcome outcome, bool isMin)
+	private void SaveToCache(IBoard board, double score)
 	{
-		if (!_cache.ContainsKey(board))
+		int frequency = _boardFrequency[board];
+		while (_cache.Count < frequency)
 		{
-			if (isMin) outcome = ReverseOutcome(outcome);
-			_cache.Add(board, outcome);
+			_cache.Add(new Dictionary<IBoard, double>());
 		}
+		_cache[frequency - 1].TryAdd(board, score);
 	}
 
-	private Outcome LoadFromCache(IBoard board, bool isMin)
+	private bool CacheContains(IBoard board)
 	{
-		Outcome result = Outcome.Invalid;
-
-		if (_cache.ContainsKey(board))
+		int frequency = _boardFrequency[board];
+		if (_cache.Count < frequency)
 		{
-			result = _cache[board];
-			if (isMin) result = ReverseOutcome(result);
+			return false;
 		}
-
-		return result;
+		return _cache[frequency - 1].ContainsKey(board);
 	}
 
-	private void UpdateFrequency(IBoard board)
+	private double LoadFromCache(IBoard board)
+	{
+		return _cache[_boardFrequency[board] - 1][board];
+	}
+
+	private void IncreaseFrequency(IBoard board)
 	{
 		if (!_boardFrequency.ContainsKey(board))
 		{
-			_boardFrequency[board] = 0;
+			_boardFrequency.Add(board, 0);
 		}
 		_boardFrequency[board]++;
+	}
+
+	private void DecreaseFrequency(IBoard board)
+	{
+		_boardFrequency[board]--;
 	}
 
 	private bool IsTied(IBoard board)
@@ -139,31 +184,35 @@ public class PlayerMancuna : Player
 		return _boardFrequency[board] >= 3;
 	}
 
-	private Outcome GetBoardOutcome(IBoard board, int player)
+	private double GetBoardScore(IBoard board)
 	{
-		int curr_outcome = board.winner();
-		if (curr_outcome == -2) return Outcome.Unknown;
-		if (curr_outcome == -1) return Outcome.Tie;
-		if (curr_outcome == player) return Outcome.Win;
-		return Outcome.Lose;
+		return board.score(_position);
 	}
 
-	private int GetOtherPlayer(int player)
+	private bool GameEnded(IBoard board)
 	{
-		if (player == 0) return 1;
-		return 0;
+		return board.winner() != -2;
 	}
 
-	private double GetBoardScore(IBoard board, int player)
+	private bool HasReset(IBoard board)
 	{
-		return board.score(player) - board.score(_otherPlayer);
-	}
-
-	private Outcome ReverseOutcome(Outcome outcome)
-	{
-		Outcome reverseOutcome = outcome;
-		if (outcome == Outcome.Win) reverseOutcome = Outcome.Lose;
-		else if (outcome == Outcome.Lose) reverseOutcome = Outcome.Win;
-		return reverseOutcome;
+		bool hasReset = false;
+		if (_firstBoardHash == -1)
+		{
+			_firstBoardHash = board.hash();
+			hasReset = true;
+		}
+		else if (_firstBoardHash == board.hash())
+		{
+			hasReset = true;
+		}
+		board.nextPlayer();
+		if (_firstBoardHash == board.hash())
+		{
+			_firstBoardHash = board.hash();
+			hasReset = true;
+		}
+		board.nextPlayer();
+		return hasReset;
 	}
 }
