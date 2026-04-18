@@ -58,9 +58,9 @@ public class MancunaMatch
 				// added by me
 				if (verbose)
 				{
-					if (winner == -1) Console.WriteLine("tie! <-------------");
-					else if (winner == 0) Console.WriteLine(players[0].name() + " wins! <-------------");
-					else if (winner == 1) Console.WriteLine(players[1].name() + " wins! <-------------");
+					if (winner == -1) Console.WriteLine("tie! (" + score.score(0) + "/" + score.score(1) + ") <-------------\n");
+					else if (winner == 0) Console.WriteLine(players[0].name() + " wins! (" + score.score(0) + "/" + score.score(1) + ") <-------------\n");
+					else if (winner == 1) Console.WriteLine(players[1].name() + " wins! (" + score.score(0) + "/" + score.score(1) + ") <-------------\n");
 				}
 				// added by me
 

@@ -11,6 +11,9 @@ public class PlayerMancuna : Player
 	private Dictionary<IBoard, ulong> _boardFrequency;
 	private ulong _maxDepth;
 	private bool _first;
+	private Random _rng;
+	private List<IBoard> _opponentPossiblePlays;
+	private int _count;
 
 	public PlayerMancuna(string name, int pos) : base(name, pos)
 	{
@@ -18,6 +21,9 @@ public class PlayerMancuna : Player
 		_boardFrequency = new Dictionary<IBoard, ulong>();
 		_maxDepth = ulong.MaxValue;
 		_first = true;
+		_rng = new Random();
+		_opponentPossiblePlays = new List<IBoard>();
+		_count = 0;
 	}
 
 	private enum Outcome
@@ -32,38 +38,73 @@ public class PlayerMancuna : Player
 	public override int play(IBoard board)
 	{ 
 		if (_first) CachePlays(board);
+		if (!_opponentPossiblePlays.Contains(board)) Reset();
+
+		IncreaseFrequency(board);
 
 		int forcedPlay = board.forcedPlay();
-		if (forcedPlay != -1) return forcedPlay;
+		if (forcedPlay != -1)
+		{
+			List<IBoard> forcedPlayChildren;
+			(forcedPlayChildren, _) = board.children();
+			(_opponentPossiblePlays, _) = forcedPlayChildren[0].children();
+			IncreaseFrequency(forcedPlayChildren[0]);
+			return forcedPlay;
+		}
 
 		List<IBoard> children;
-		List<int> play;
-		(children, play) = board.children();
+		List<int> plays;
+		(children, plays) = board.children();
 
-		Outcome outcome0 = LoadFromCache(children[0], true);
-		Outcome outcome1 = LoadFromCache(children[1], true);
-
-		if (outcome0 == Outcome.Win) return play[0];
-		if (outcome1 == Outcome.Win) return play[1];
-
-		// if (outcome0 == Outcome.Tie && outcome1 == Outcome.Tie)
-		// {
-		// 	if (children[0].score())
-		// }
-
-		if (outcome0 == Outcome.Tie) return play[0];
-		if (outcome1 == Outcome.Tie) return play[1];
-
-		if (outcome0 == Outcome.Unknown) return play[0];
-		if (outcome1 == Outcome.Unknown) return play[1];
-
-		return play[0];
+		int decision = Decide(children[0], children[1], plays);
+		if (decision == plays[0])
+		{
+			IncreaseFrequency(children[0]);
+			(_opponentPossiblePlays, _) = children[0].children();
+		}
+		else
+		{
+			IncreaseFrequency(children[1]);
+			(_opponentPossiblePlays, _) = children[1].children();
+		}
+		return decision;
 	}
 
 	private void CachePlays(IBoard board)
 	{
 		_first = false;
 		GetOutcome(board, 0, false);
+	}
+
+	private void Reset()
+	{
+		_boardFrequency.Clear();
+		_count++;
+		// Console.WriteLine(_count);
+	}
+
+	private int Decide(IBoard board0, IBoard board1, List<int> plays)
+	{
+		Outcome outcome0 = LoadFromCache(board0, true);
+		Outcome outcome1 = LoadFromCache(board1, true);
+
+		if (outcome0 == Outcome.Win) return plays[0];
+		if (outcome1 == Outcome.Win) return plays[1];
+
+		// if (outcome0 == Outcome.Tie && outcome1 == Outcome.Tie)
+		// {
+		// 	double score0 = GetScore(board0, 0, true);
+		// 	double score1 = GetScore(board1, 0, true);
+		// 	return score0 >= score1 ? plays[0] : plays[1];
+		// }
+
+		if (outcome0 == Outcome.Tie) return plays[0];
+		if (outcome1 == Outcome.Tie) return plays[1];
+
+		if (outcome0 == Outcome.Unknown) return plays[0];
+		if (outcome1 == Outcome.Unknown) return plays[1];
+
+		return plays[0];
 	}
 
 	private Outcome GetOutcome(IBoard board, ulong depth, bool isMin)
@@ -168,5 +209,58 @@ public class PlayerMancuna : Player
 		if (outcome == Outcome.Win) return Outcome.Lose;
 		if (outcome == Outcome.Lose) return Outcome.Win;
 		return outcome;
+	}
+
+	private double GetScore(IBoard board, ulong depth, bool isMin)
+	{
+		if (depth >= _maxDepth) return -1.0;
+
+		IncreaseFrequency(board);
+		if (IsTied(board))
+		{
+			DecreaseFrequency(board);
+			return board.score(_position);
+		}
+
+		List<IBoard> children;
+		(children, _) = board.children();
+
+		if (children.Count < 2)
+		{
+			double score = GetScore(children[0], depth + 1, !isMin);
+			DecreaseFrequency(board);
+			return score;
+		}
+
+		Outcome outcome0 = LoadFromCache(children[0], isMin);
+		Outcome outcome1 = LoadFromCache(children[1], isMin);
+
+		if (outcome0 == Outcome.Tie && outcome1 == Outcome.Tie)
+		{
+			double score0 = GetScore(children[0], depth + 1, !isMin);
+			double score1 = GetScore(children[1], depth + 1, !isMin);
+			DecreaseFrequency(board);
+			return isMin ? double.Min(score0, score1) : double.Max(score0, score1);
+		}
+
+		if (outcome0 == Outcome.Tie)
+		{
+			double score = GetScore(children[0], depth + 1, !isMin);
+			DecreaseFrequency(board);
+			return score;
+		}
+		else if (outcome1 == Outcome.Tie)
+		{
+			double score = GetScore(children[1], depth + 1, !isMin);
+			DecreaseFrequency(board);
+			return score;
+		}
+
+		throw new Exception("Invalid state.");
+	}
+
+	private bool IsGameOver(IBoard board)
+	{
+		return IsTied(board) || board.winner() != -2;
 	}
 }
