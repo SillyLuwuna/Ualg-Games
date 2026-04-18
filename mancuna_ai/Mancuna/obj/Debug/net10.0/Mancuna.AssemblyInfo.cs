@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Mancuna")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7c29f6cc53c90df2943d4e365a56af64616ea2e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b4db05987b2dccd3c2e4ad98a116f3a85dd78936")]
 [assembly: System.Reflection.AssemblyProductAttribute("Mancuna")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Mancuna")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

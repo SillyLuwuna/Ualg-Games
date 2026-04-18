@@ -91,12 +91,13 @@ public class PlayerMancuna : Player
 		if (outcome0 == Outcome.Win) return plays[0];
 		if (outcome1 == Outcome.Win) return plays[1];
 
-		// if (outcome0 == Outcome.Tie && outcome1 == Outcome.Tie)
-		// {
-		// 	double score0 = GetScore(board0, 0, true);
-		// 	double score1 = GetScore(board1, 0, true);
-		// 	return score0 >= score1 ? plays[0] : plays[1];
-		// }
+		if (outcome0 == Outcome.Tie && outcome1 == Outcome.Tie)
+		{
+			// double score0 = GetScore(board0, 0, true);
+			// double score1 = GetScore(board1, 0, true);
+			// return score0 >= score1 ? plays[0] : plays[1];
+			// return _rng.Next() <= Int32.MaxValue / 2 ? plays[0] : plays[1];
+		}
 
 		if (outcome0 == Outcome.Tie) return plays[0];
 		if (outcome1 == Outcome.Tie) return plays[1];
