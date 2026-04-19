@@ -1,0 +1,278 @@
+\documentclass[11pt]{beamer}
+\usetheme{Madrid}
+\usefonttheme{serif}
+
+\usepackage[utf8]{inputenc}
+% \usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\usepackage{caption}
+\usepackage{siunitx}
+
+\usepackage{booktabs}
+
+\DeclareMathOperator{\sen}{sen}
+\DeclareMathOperator{\tg}{tg}
+
+\setbeamertemplate{caption}[numbered]
+
+\author[Luna Fonseca]{Luna Fonseca \\ Professor: Hélder Daniel}
+\title[Mancuna AI]{Mancuna AI}
+% Informe o seu email de contato no comando a seguir
+% Por exemplo, alcebiades.col@ufes.br
+\newcommand{\email}{email}
+%\setbeamercovered{transparent} 
+\setbeamertemplate{navigation symbols}{} 
+\logo{\includegraphics[scale=0.15]{images/ualg_tiny.png}}
+\institute[]{UALG \par MASTERS IN INFORMATICS ENGINEERING} 
+\date{18 April 2026}
+%\subject{}
+
+% ---------------------------------------------------------
+% Selecione um estilo de referência
+\bibliographystyle{apalike}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+\begin{frame}{Table of contents}
+    \only<1>{\tableofcontents[sections={1-4}]}
+    % \only<2>{\tableofcontents[sections={5-6}]}
+\end{frame}
+
+
+\section{Problem Analysis}
+
+\begin{frame}
+    \begin{beamercolorbox}[sep=8pt,center,rounded=true,shadow=true]{title}
+		\usebeamerfont{title}\Huge\textbf{Problem Analysis}
+    \end{beamercolorbox}
+\end{frame}
+
+\begin{frame}{Problem Analysis}
+	\begin{center}
+		\begin{table}
+			\begin{center}
+				\begin{tabular}{| c | c |}
+					2 & 2\\
+					\hline
+					\hline
+					2 & 2\\
+				\end{tabular}
+				\caption{Starting Mancuna board}
+			\end{center}
+		\end{table}
+	\end{center}
+	\begin{itemize}
+		\item Board is 2x2.
+		\item Pieces move counter-clockwise.
+		\item There is a total of 8 pieces.
+		\item Tie repetition length of 3.
+		\item Maximum of two possible moves each turn.
+		\item If there are no legal moves, the opponent wins by default.
+		\item The score is based on how many pieces are in each player's board.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Analysis}
+	When looking at the search space abstractly we can infer certain information.
+	\begin{itemize}
+		\item There are about $\sim 150$ possible board combinations.
+		\item Considering who makes the next move, there are about $\sim 300$ possible board combinations
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Analysis}
+	Looking at the search space during all possible match combinations,
+	some more interesting conclusions can be drawn.
+
+	\bigskip
+
+	During a match there are only \textbf{113 possible states}, taking into account who makes the next move.
+
+	\bigskip
+
+	With a branching factor of 2 at most, the search space \textbf{seems extremely small}.
+\end{frame}
+
+\begin{frame}{Problem Analysis}
+	In reality such is not the case.
+
+	\bigskip
+
+	The tie repetition rule makes it so that each branch in the search space is different: \textbf{caching is not possible}.
+
+	\bigskip
+
+	Because caching is not possible, and given that there are tie loops of over 30 plays long,
+	the search space quickly becomes over $2^{30}$ which \textbf{exceeds a billion different branches}.
+\end{frame}
+
+
+
+\section{Best Option AI}
+
+\begin{frame}
+    \begin{beamercolorbox}[sep=8pt,center,rounded=true,shadow=true]{title}
+		\usebeamerfont{title}\Huge\textbf{Best Option AI}
+    \end{beamercolorbox}
+\end{frame}
+
+\begin{frame}{Best Option AI}
+	The idea is to implement a minmax-like algorithm while disregarding the score and
+	looking only at \textbf{the worst-case outcome} for a play.
+
+	\bigskip
+
+	When looking at the search space in this manner, \textbf{caching becomes possible again}.
+
+	\bigskip
+
+	This means that the minmax must \textbf{at most calculate 113 states}, at which point it
+	already knows the entire search space.
+\end{frame}
+
+\begin{frame}{Best Option AI}
+	Upon having the worst-case outcome for every single possible board, the AI
+	executes the following heuristic.
+
+	\bigskip
+
+	\begin{itemize}
+		\item If there is only one legal move, it will play it blindly.
+		\item If one of the moves has the worst-case outcome of a win, that move will be played.
+		\item If no winning moves exist, the first move with the worst-case outcome as a tie will be played.
+		\item If there are no winning or tying moves, the first move is played.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Best Option AI}
+	\begin{center}
+		\huge \textbf{Results}
+	\end{center}
+
+	\bigskip
+
+	On both sides of the board this AI ties with the expert AI, achieving a score of 5-3 regardless of
+	going first or second.
+
+	\bigskip
+
+	On the first move for both sides of the board, this AI has at least one move which has a worst-case
+	outcome of a tie.
+
+	\bigskip
+
+	This means that this is a \textbf{complete game} where only ties
+	are possible when both players play optimally.
+\end{frame}
+
+\section{Best Score AI}
+
+\begin{frame}
+    \begin{beamercolorbox}[sep=8pt,center,rounded=true,shadow=true]{title}
+		\usebeamerfont{title}\Huge\textbf{Best Score AI}
+    \end{beamercolorbox}
+\end{frame}
+
+\begin{frame}{Best Score AI}
+	As explained eariler, we cannot do a blind search across the entire search space.
+
+	\bigskip
+
+	However, we can \textbf{exploit the Best Option AI} to search only through a very small
+	portion of the entire search space.
+\end{frame}
+
+\begin{frame}{Best Score AI}
+	\textbf{Whenever the Best Option AI is in a situation where both options lead to a tie,
+	we can execute minmax through the search space considering only the tying moves.}
+
+	\bigskip
+
+	With this, we get a \textbf{worst-case tying score} for each move.
+
+	\bigskip
+
+	Upon having this score, this AI behaves exactly like the Best Option AI, however,
+	when both options are ties, it will choose the one that is guaranteed a higher score.
+\end{frame}
+
+\begin{frame}{Best Score AI}
+	\begin{center}
+		\huge \textbf{Results}
+	\end{center}
+
+	\bigskip
+
+	When playing \textbf{first}, it ties \textbf{4-4} with the expert AI.
+
+	When playing \textbf{second}, it ties \textbf{5-3} with the expert AI.
+\end{frame}
+
+\begin{frame}{Best Score AI}
+	When playing optimally, the \textbf{first} player can only tie with a score of \textbf{at most 3}.
+	While the \textbf{second} player can only tie with a score of \textbf{at most 5}.
+
+	\bigskip
+
+	With this, we can conclude that \textbf{the game is solved} and the \textbf{Best Score AI plays optimally}.
+\end{frame}
+
+\begin{frame}{Best Score AI}
+	\begin{center}
+		\huge \textbf{If it plays optimally, why does it get a lower score against the expert AI than the "dumber" Best Option AI?}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Best Score AI}
+	The reason for the "smarter" AI to perform worst is that it \textbf{assumes both players
+	play optimally}.
+
+	\bigskip
+
+	The expert AI does not play optimally. And as such it has patterns that can be exploited.
+
+	\bigskip
+
+	\textbf{By cheer luck}, the Best Option AI, as it plays double tying moves blindly, plays a pattern
+	in which the expert AI \textbf{makes mistakes} and ends up tying with a higher score.
+
+	\bigskip
+
+	As the Best Score AI only plays optimally, and by \textbf{cheer luck} in the optimal play the expert
+	AI \textbf{does not make the same mistakes}, it ends up with a lower score. Even then the expert AI makes one mistake,
+	which leads the Best Score AI to be able to achieve a score of 4-4 instead of the expected 3-5.
+\end{frame}
+
+\section{Final AI and remarks}
+
+\begin{frame}
+    \begin{beamercolorbox}[sep=8pt,center,rounded=true,shadow=true]{title}
+		\usebeamerfont{title}\Huge\textbf{Final AI and remarks}
+    \end{beamercolorbox}
+\end{frame}
+
+\begin{frame}{Final AI and remarks}
+	The final AI used was the \textbf{Best Option AI}. Although worse, it performs better for the competition.
+
+	\bigskip
+
+	\textbf{For playing optimally} the Best Score AI would be used, as it plays optimally.
+
+	\bigskip
+
+	\textbf{For the competition}, an AI could be developed that specifically exploits the expert AI.
+	With that strategy it could be \textbf{theoretically possible to achieve higher scores or even win against
+	the expert AI}, depending on if it has any path of play in which it makes worse blunders.
+\end{frame}
+
+\end{document}
