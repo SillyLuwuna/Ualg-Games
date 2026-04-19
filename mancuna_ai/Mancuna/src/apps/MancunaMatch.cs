@@ -27,6 +27,7 @@ public class MancunaMatch
     static IPlayer rp = new PlayerMancRandom("Rnd", 0); 
     static IPlayer xp = new PlayerMancExpert("Expert", 0);  // the ones we have to try to beat
     static IPlayer mp = new PlayerMancuna("MancunaPlayer0", 0);
+    static IPlayer mp0 = new PlayerMancuna("MancunaPlayer1", 0);
 
     static int matches = 10000;
     static bool verbose = false;

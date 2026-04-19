@@ -9,7 +9,7 @@ public class PlayerMancuna : Player
 {
     private Dictionary<IBoard, Outcome> _cache;
 	private Dictionary<IBoard, ulong> _boardFrequency;
-	private ulong _maxDepth;
+	private readonly ulong _maxDepth;
 	private bool _first;
 	private Random _rng;
 	private List<IBoard> _opponentPossiblePlays;
@@ -166,8 +166,7 @@ public class PlayerMancuna : Player
 
 	private void SaveToCache(IBoard board, Outcome outcome, bool isMin)
 	{
-		if (isMin) outcome = ReverseOutcome(outcome);
-		_cache.TryAdd(board, outcome);
+		_cache.TryAdd(board, isMin ? ReverseOutcome(outcome) : outcome);
 	}
 
 	private Outcome LoadFromCache(IBoard board, bool isMin)
@@ -176,13 +175,12 @@ public class PlayerMancuna : Player
 		bool cacheHit = _cache.TryGetValue(board, out result);
 		if (!cacheHit) return Outcome.Invalid;
 
-		if (isMin) result = ReverseOutcome(result);
-		return result;
+		return isMin ? ReverseOutcome(result) : result;
 	}
 
 	private void IncreaseFrequency(IBoard board)
 	{
-		_boardFrequency.TryAdd(board, 0);
+		_boardFrequency.TryAdd(new BoardMancuna((BoardMancuna)board), 0); // boards aren't immutable! This causes a ton of issues with colliding hashes. Patch fix.
 		_boardFrequency[board]++;
 	}
 
@@ -257,6 +255,8 @@ public class PlayerMancuna : Player
 			return score;
 		}
 
+		DecreaseFrequency(board);
+		// return -1.0;
 		throw new Exception("Invalid state.");
 	}
 
