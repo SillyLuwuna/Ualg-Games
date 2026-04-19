@@ -14,6 +14,7 @@ public class PlayerMancuna : Player
 	private Random _rng;
 	private List<IBoard> _opponentPossiblePlays;
 	private int _count;
+	private int _cachedPos;
 
 	public PlayerMancuna(string name, int pos) : base(name, pos)
 	{
@@ -24,6 +25,7 @@ public class PlayerMancuna : Player
 		_rng = new Random();
 		_opponentPossiblePlays = new List<IBoard>();
 		_count = 0;
+		_cachedPos = _position; // position isn't accurate unless match.reset() is called which is not the case for human matches
 	}
 
 	private enum Outcome
@@ -73,6 +75,7 @@ public class PlayerMancuna : Player
 	private void CachePlays(IBoard board)
 	{
 		_first = false;
+		_cachedPos = _position;
 		GetOutcome(board, 0, false);
 	}
 
@@ -85,8 +88,8 @@ public class PlayerMancuna : Player
 
 	private int Decide(IBoard board0, IBoard board1, List<int> plays)
 	{
-		Outcome outcome0 = LoadFromCache(board0, true);
-		Outcome outcome1 = LoadFromCache(board1, true);
+		Outcome outcome0 = LoadFromCache(board0);
+		Outcome outcome1 = LoadFromCache(board1);
 
 		if (outcome0 == Outcome.Win) return plays[0];
 		if (outcome1 == Outcome.Win) return plays[1];
@@ -96,6 +99,7 @@ public class PlayerMancuna : Player
 			// double score0 = GetScore(board0, 0, true);
 			// double score1 = GetScore(board1, 0, true);
 			// return score0 >= score1 ? plays[0] : plays[1];
+
 			// return _rng.Next() <= Int32.MaxValue / 2 ? plays[0] : plays[1];
 		}
 
@@ -112,7 +116,7 @@ public class PlayerMancuna : Player
 	{
 		if (depth >= _maxDepth) return Outcome.Unknown;
 
-		Outcome cacheResult = LoadFromCache(board, isMin);
+		Outcome cacheResult = LoadFromCache(board);
 		if (cacheResult != Outcome.Invalid) return cacheResult;
 
 		IncreaseFrequency(board);
@@ -133,7 +137,7 @@ public class PlayerMancuna : Player
 		(children, _) = board.children();
 
 		Outcome outcome0 = GetOutcome(children[0], depth + 1, !isMin);
-		SaveToCache(children[0], outcome0, !isMin);
+		SaveToCache(children[0], outcome0);
 
 		if (outcome0 == Outcome.Win && !isMin)
 		{
@@ -150,7 +154,7 @@ public class PlayerMancuna : Player
 		if (children.Count > 1)
 		{
 			outcome1 = GetOutcome(children[1], depth + 1, !isMin);
-			SaveToCache(children[1], outcome1, !isMin);
+			SaveToCache(children[1], outcome1);
 		}
 
 		DecreaseFrequency(board);
@@ -164,18 +168,18 @@ public class PlayerMancuna : Player
 		return isMin ? Outcome.Win : Outcome.Lose;
 	}
 
-	private void SaveToCache(IBoard board, Outcome outcome, bool isMin)
+	private void SaveToCache(IBoard board, Outcome outcome)
 	{
-		_cache.TryAdd(board, isMin ? ReverseOutcome(outcome) : outcome);
+		_cache.TryAdd(new BoardMancuna((BoardMancuna)board), outcome);
 	}
 
-	private Outcome LoadFromCache(IBoard board, bool isMin)
+	private Outcome LoadFromCache(IBoard board)
 	{
 		Outcome result = Outcome.Invalid;
 		bool cacheHit = _cache.TryGetValue(board, out result);
 		if (!cacheHit) return Outcome.Invalid;
 
-		return isMin ? ReverseOutcome(result) : result;
+		return (_cachedPos != _position) ? ReverseOutcome(result) : result;
 	}
 
 	private void IncreaseFrequency(IBoard board)
@@ -231,8 +235,8 @@ public class PlayerMancuna : Player
 			return score;
 		}
 
-		Outcome outcome0 = LoadFromCache(children[0], isMin);
-		Outcome outcome1 = LoadFromCache(children[1], isMin);
+		Outcome outcome0 = LoadFromCache(children[0]);
+		Outcome outcome1 = LoadFromCache(children[1]);
 
 		if (outcome0 == Outcome.Tie && outcome1 == Outcome.Tie)
 		{

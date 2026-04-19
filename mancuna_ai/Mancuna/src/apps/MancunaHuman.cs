@@ -25,13 +25,15 @@ public class MancunaHuman
     */
     static IPlayer rp = new PlayerMancRandom("Rnd", 0); 
     static IPlayer xp = new PlayerMancExpert("Expert", 0);
+    static IPlayer mp = new PlayerMancuna("SillyAI", 0);
     static IPlayer hp = new PlayerMancHuman("Human", 0); 
 
-    static List<IPlayer> players = [hp, rp];
+    static List<IPlayer> players = [hp, mp];
 
     public static void Main2(string[] args)
     {
         BoardMancuna board = new(players);
+		board.reset();
         
         Match match = new Match(board, true);
         Score score = match.play();
